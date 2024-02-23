@@ -1,4 +1,6 @@
-from internal.services.msg_service import MSGService
+from datetime import datetime
+
+from src.msg_service import MSGService
 
 
 def test_add_message():
@@ -66,11 +68,15 @@ def test_generate_most_common_words():
         for msg in test_table[channel]:
             ms.add_message(channel, *msg)
 
-    assert ms.generate_most_common_words() == [
-        ('prod', 3),
-        ('db', 2),
-        ('are', 2),
-        ('fired', 2),
-        ('BYE', 2)
-    ]
+    image_path: str = f"./static/png/MostCommonWords_{datetime.today().strftime("%Y-%m-%d_%H-%M-%S")}.png"
+    assert ms.generate_most_common_words() == image_path
 
+
+def test_uninitialized(capsys):
+    ms = MSGService()
+
+    ms.notify_admin_unread()
+    captured = capsys.readouterr()
+    assert captured.out == ""
+
+    assert ms.generate_most_common_words() is None
