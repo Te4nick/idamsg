@@ -25,10 +25,12 @@ class MSGService:
             return self.messages[ch_id]
         return None
 
-    def notify_admin_unread(self):
+    def notify_admin_unread(self) -> bool:
         unread_count = sum(self.unread.values())
         if unread_count >= 7:
             print(f"Admin: unread messages in {unread_count} conversations.")
+            return True
+        return False
 
     def generate_most_common_words(self) -> str | None:
         all_words = " ".join(
@@ -52,4 +54,4 @@ class MSGService:
         filename: str = f"MostCommonWords_{time_formatted}.png"
         plt.savefig(self.image_output_path + filename, bbox_inches="tight")
 
-        return self.image_output_path + filename
+        return filename

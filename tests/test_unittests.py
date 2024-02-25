@@ -68,7 +68,7 @@ def test_generate_most_common_words():
         for msg in test_table[channel]:
             ms.add_message(channel, *msg)
 
-    image_path: str = f"./static/png/MostCommonWords_{datetime.today().strftime("%Y-%m-%d_%H-%M-%S")}.png"
+    image_path: str = f"MostCommonWords_{datetime.today().strftime("%Y-%m-%d_%H-%M-%S")}.png"
     assert ms.generate_most_common_words() == image_path
 
 
