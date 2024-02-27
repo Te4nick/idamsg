@@ -1,5 +1,11 @@
-from src.msg_service import MSGService
+import uvicorn
+from src import app
 
-if __name__ == '__main__':
-    service = MSGService()
-    service.generate_most_common_words()
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+    )

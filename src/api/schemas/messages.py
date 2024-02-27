@@ -26,4 +26,10 @@ class MessageIn(Message):
 
 
 class MessageAllOut(BaseModel):
-    messages: list[Message] = []
+    messages: list[Message] = Field(
+        [],
+        description="List of messages from channel",
+        examples=[
+            [Message(content="string", author="string")],
+        ],
+    )

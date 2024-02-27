@@ -5,9 +5,9 @@ from fastapi import APIRouter, status, HTTPException, Response
 from icecream import ic
 from typing import Annotated
 
-from src.api_v1.schemas.messages import Message, MessageIn, MessageAllOut
-from src.api_v1.schemas.channels import Channel, ChannelAllUnreadOut
-from src.api_v1.schemas.image import Image
+from src.api.schemas.messages import Message, MessageIn, MessageAllOut
+from src.api.schemas.channels import Channel, ChannelAllUnreadOut
+from src.api.schemas.image import Image
 from src.msg_service import MSGService
 
 router = APIRouter(tags=["Messages"])
@@ -26,7 +26,7 @@ def create_message(msg: MessageIn):
 
 
 @router.get(
-    "/messages/{channel_id}/{offset}/{limit}",
+    "/messages/{channel_id}",
     responses={
         status.HTTP_200_OK: {"model": MessageAllOut},
         status.HTTP_404_NOT_FOUND: {"model": None},
@@ -40,7 +40,7 @@ def get_messages(
     if msgs is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    out = MessageAllOut()
+    out = MessageAllOut(messages=[])
     for i in range(offset, offset + limit):
         try:
             out.messages.append(Message(author=msgs[i][0], content=msgs[i][1]))
