@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.msg_service import MSGService
+from msg_service import MSGService
 
 
 def test_add_message():

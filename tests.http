@@ -1,0 +1,85 @@
+# Create message
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+
+
+# Get channel_id=prod messages
+GET http://localhost:8000/messages?channel_id=prod HTTP/1.1
+###
+
+# Create 7 channels to test unread
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod1",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod2",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod3",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod4",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod5",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod6",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+POST http://localhost:8000/messages HTTP/1.1
+content-type: application/json
+
+{
+  "channel_id": "prod7",
+  "author": "/dev/null",
+  "content": "testing stuff"
+}
+###
+GET http://localhost:8000/messages/unread HTTP/1.1
+###
+
+GET http://localhost:8000/messages?channel_id=prod1 HTTP/1.1
+###
