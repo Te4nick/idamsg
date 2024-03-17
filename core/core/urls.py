@@ -51,4 +51,22 @@ urlpatterns = [
         ),
         name="unread",
     ),
+    path(
+        "image/generate",
+        MessageViewSet.as_view(
+            {
+                "get": "generate_image",
+            }
+        ),
+        name="generate_image",
+    ),
+    path(
+        "image/status",
+        MessageViewSet.as_view(
+            {
+                "get": "get_image_status",
+            }
+        ),
+        name="get_image_status",
+    ),
 ]

@@ -4,13 +4,16 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.exceptions import ValidationError
-from .services.msg_service import MSGService
+from .services import MSGService, ImageService
 from .serializers import (
-    QuerySerializer,
+    GetChannelMessagesQuerySerializer,
     InMessageSerializer,
     MessageSerializer,
     ChannelSerializer,
+    OperationSerializer,
+    GetOperationQuerySerializer,
 )
+from .services.ops_service import OperationsService, UUID
 
 
 @extend_schema_view(
@@ -24,7 +27,7 @@ from .serializers import (
     ),
     get_messages=extend_schema(
         summary="Get channel messages list",
-        parameters=[QuerySerializer],
+        parameters=[GetChannelMessagesQuerySerializer],
         responses={
             status.HTTP_200_OK: MessageSerializer(many=True),
             status.HTTP_404_NOT_FOUND: None,
@@ -39,17 +42,27 @@ from .serializers import (
         },
         auth=False,
     ),
+    generate_image=extend_schema(
+        summary="Generate image and get operation details",
+        responses={
+            status.HTTP_200_OK: OperationSerializer,
+        },
+        auth=False,
+    ),
+    get_image_status=extend_schema(
+        summary="Get image generation status",
+        parameters=[GetOperationQuerySerializer],
+        responses={
+            status.HTTP_200_OK: OperationSerializer,
+            status.HTTP_404_NOT_FOUND: None,
+        },
+        auth=False,
+    ),
 )
 class MessageViewSet(ViewSet):
     msg_service = MSGService()
-
-    # def list(self, request):
-    #     query_ser = QuerySerializer(data=request.query_params)
-    #
-    #     if not query_ser.is_valid():
-    #         raise ValidationError(query_ser.errors)
-    #     applications = self.app_service.get_applications(**query_ser.data)
-    #     return Response(ApplicationDetailsSerializer(applications, many=True).data)
+    image_service = ImageService()
+    ops_service = OperationsService()
 
     @action(detail=False, methods=["POST"])
     def post_message(self, request):
@@ -57,11 +70,12 @@ class MessageViewSet(ViewSet):
         if not in_msg.is_valid():
             raise ValidationError(in_msg.errors)
         self.msg_service.add_message(**in_msg.data)
+        self.image_service.put_string(in_msg.data.get("content"))
         return Response(status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=["GET"])
     def get_messages(self, request):
-        query_ser = QuerySerializer(data=request.query_params)
+        query_ser = GetChannelMessagesQuerySerializer(data=request.query_params)
         if not query_ser.is_valid():
             raise ValidationError(query_ser.errors)
         msgs = self.msg_service.get_channel_messages(query_ser.data.get("channel_id"))
@@ -82,4 +96,29 @@ class MessageViewSet(ViewSet):
         return Response(
             status=status.HTTP_200_OK,
             data=ChannelSerializer(unread_channels, many=True).data,
+        )
+
+    @action(detail=False, methods=["GET"])
+    def generate_image(self, _):
+        op_id = self.ops_service.execute_operation(self.image_service.generate_image)
+        op = self.ops_service.get_operation(op_id)
+        return Response(
+            status=status.HTTP_200_OK,
+            data=OperationSerializer(op).data,
+        )
+
+    @action(detail=False, methods=["GET"])
+    def get_image_status(self, request):
+        query_ser = GetOperationQuerySerializer(data=request.query_params)
+        if not query_ser.is_valid():
+            raise ValidationError(query_ser.errors)
+
+        op = self.ops_service.get_operation(UUID(query_ser.data.get("id")))
+        if op is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        op.result = {"path": op.result}
+        return Response(
+            status=status.HTTP_200_OK,
+            data=OperationSerializer(op).data,
         )
