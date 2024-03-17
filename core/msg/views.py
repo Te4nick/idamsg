@@ -2,9 +2,9 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.utils.serializer_helpers import ReturnDict
 from rest_framework.viewsets import ViewSet
-from rest_framework.exceptions import ValidationError
-from .services import MSGService, ImageService
+from .services import MSGService, ImageService, OperationsService
 from .serializers import (
     GetChannelMessagesQuerySerializer,
     InMessageSerializer,
@@ -13,7 +13,7 @@ from .serializers import (
     OperationSerializer,
     GetOperationQuerySerializer,
 )
-from .services.ops_service import OperationsService, UUID
+from uuid import UUID
 
 
 @extend_schema_view(
@@ -22,6 +22,7 @@ from .services.ops_service import OperationsService, UUID
         request=InMessageSerializer,
         responses={
             status.HTTP_201_CREATED: None,
+            status.HTTP_422_UNPROCESSABLE_ENTITY: ReturnDict,
         },
         auth=False,
     ),
@@ -31,6 +32,7 @@ from .services.ops_service import OperationsService, UUID
         responses={
             status.HTTP_200_OK: MessageSerializer(many=True),
             status.HTTP_404_NOT_FOUND: None,
+            status.HTTP_422_UNPROCESSABLE_ENTITY: ReturnDict,
         },
         auth=False,
     ),
@@ -55,6 +57,7 @@ from .services.ops_service import OperationsService, UUID
         responses={
             status.HTTP_200_OK: OperationSerializer,
             status.HTTP_404_NOT_FOUND: None,
+            status.HTTP_422_UNPROCESSABLE_ENTITY: ReturnDict,
         },
         auth=False,
     ),
@@ -68,19 +71,32 @@ class MessageViewSet(ViewSet):
     def post_message(self, request):
         in_msg = InMessageSerializer(data=request.data)
         if not in_msg.is_valid():
-            raise ValidationError(in_msg.errors)
+            return Response(
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                data=in_msg.errors,
+            )
+
         self.msg_service.add_message(**in_msg.data)
         self.image_service.put_string(in_msg.data.get("content"))
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(
+            status=status.HTTP_201_CREATED,
+        )
 
     @action(detail=False, methods=["GET"])
     def get_messages(self, request):
         query_ser = GetChannelMessagesQuerySerializer(data=request.query_params)
         if not query_ser.is_valid():
-            raise ValidationError(query_ser.errors)
+            return Response(
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                data=query_ser.errors,
+            )
+
         msgs = self.msg_service.get_channel_messages(query_ser.data.get("channel_id"))
         if msgs is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
         return Response(
             status=status.HTTP_200_OK,
             data=MessageSerializer(msgs, many=True).data,
@@ -111,11 +127,16 @@ class MessageViewSet(ViewSet):
     def get_image_status(self, request):
         query_ser = GetOperationQuerySerializer(data=request.query_params)
         if not query_ser.is_valid():
-            raise ValidationError(query_ser.errors)
+            return Response(
+                status=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                data=query_ser.errors,
+            )
 
         op = self.ops_service.get_operation(UUID(query_ser.data.get("id")))
         if op is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
         op.result = {"path": op.result}
         return Response(

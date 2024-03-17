@@ -27,8 +27,8 @@ class MSGService:
         unread_channels_keys: list[str] = list(self.unread_channels.keys())
         notify_condition: bool = len(unread_channels_keys) >= 7
         if notify_condition:
-            print(
-                f"Admin: unread messages in {len(unread_channels_keys)} conversations."
-            )
+            # print(
+            #     f"Admin: unread messages in {len(unread_channels_keys)} conversations."
+            # )
             return unread_channels_keys
         return None

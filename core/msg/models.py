@@ -10,6 +10,9 @@ class Message:
         self.author: str = author
         self.content: str = content
 
+    def __eq__(self, other: "Message") -> bool:
+        return self.author == other.author and self.content == other.content
+
 
 class Image:
     done: bool
@@ -28,3 +31,10 @@ class Operation:
         self.id = id
         self.done = done
         self.result = result
+
+    def __eq__(self, other: "Operation") -> bool:
+        return (
+            self.id == other.id
+            and self.done == other.done
+            and self.result == other.result
+        )

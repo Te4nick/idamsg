@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 class ImageService:
-    def __init__(self, image_output_path: str = "./static/img/"):
+    def __init__(self, image_output_path: str = "./static/png/"):
         self.counter = Counter()
         self.image_output_path = image_output_path + (
             "/" if image_output_path[-1] != "/" else ""
