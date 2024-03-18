@@ -21,7 +21,7 @@ from uuid import UUID
         summary="Post new message to channel by it's id",
         request=InMessageSerializer,
         responses={
-            status.HTTP_201_CREATED: None,
+            status.HTTP_201_CREATED: InMessageSerializer,
             status.HTTP_422_UNPROCESSABLE_ENTITY: ReturnDict,
         },
         auth=False,
@@ -80,6 +80,7 @@ class MessageViewSet(ViewSet):
         self.image_service.put_string(in_msg.data.get("content"))
         return Response(
             status=status.HTTP_201_CREATED,
+            data=InMessageSerializer(in_msg.data).data,
         )
 
     @action(detail=False, methods=["GET"])
@@ -138,8 +139,15 @@ class MessageViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-        op.result = {"path": op.result}
         return Response(
             status=status.HTTP_200_OK,
-            data=OperationSerializer(op).data,
+            data=OperationSerializer(
+                {
+                    "id": op.id,
+                    "done": op.done,
+                    "result": {
+                        "path": op.result[1:],
+                    },
+                }
+            ).data,
         )

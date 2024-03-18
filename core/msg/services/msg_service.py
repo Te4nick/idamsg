@@ -18,7 +18,8 @@ class MSGService:
 
     def get_channel_messages(self, chan_id: str) -> list[Message] | None:
         if (msgs := self.messages.get(chan_id)) is not None:
-            del self.unread_channels[chan_id]
+            if self.unread_channels.get(chan_id) is not None:
+                del self.unread_channels[chan_id]
             return msgs
 
         return None

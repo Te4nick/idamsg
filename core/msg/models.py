@@ -38,3 +38,12 @@ class Operation:
             and self.done == other.done
             and self.result == other.result
         )
+
+    def __repr__(self) -> str:
+        return str(
+            {
+                "id": self.id,
+                "done": self.done,
+                "result": self.result,
+            }
+        )

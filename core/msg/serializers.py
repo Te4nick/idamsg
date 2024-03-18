@@ -34,4 +34,4 @@ class OperationSerializer(serializers.Serializer):
 
 
 class GetOperationQuerySerializer(serializers.Serializer):
-    id = serializers.CharField(required=True, min_length=36, max_length=36)
+    id = serializers.UUIDField(required=True)

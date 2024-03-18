@@ -19,12 +19,14 @@ class OperationsService:
         op_id = uuid4()
         self.operations[op_id] = Operation(op_id)
 
-        scheduler.add_job(
-            self.finish_operation,
-            trigger=DateTrigger(datetime.now() if run_date is None else run_date),
-            args=(op_id, func(*args)),
-        )
+        def __exec_func() -> None:
+            res = func(*args)
+            self.finish_operation(op_id, res)
 
+        scheduler.add_job(
+            __exec_func,
+            trigger=DateTrigger(datetime.now() if run_date is None else run_date),
+        )
         return op_id
 
     def finish_operation(self, op_id: UUID, result) -> bool:

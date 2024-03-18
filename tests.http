@@ -83,3 +83,9 @@ GET http://localhost:8000/messages/unread HTTP/1.1
 
 GET http://localhost:8000/messages?channel_id=prod1 HTTP/1.1
 ###
+
+GET http://localhost:8000/image/generate HTTP/1.1
+###
+
+GET http://localhost:8000/image/status?id=cd5edaec-bf02-4e32-a59e-dbc48424b353 HTTP/1.1
+###
