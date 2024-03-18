@@ -1,3 +1,6 @@
+import time
+from datetime import datetime
+
 from core.msg.services import OperationsService, ops_service
 from core.msg.models import Operation
 from uuid import uuid4
@@ -93,16 +96,26 @@ def test_finish_operation_empty() -> None:
 
 
 def test_execute_operation_valid() -> None:
-    op_id = uuid4()
+    def func(x: int) -> int:
+        time.sleep(1)
+        return x + 1
+
     test_table = {
         "input": {
-            "op_id": op_id,
-            "result": True,
+            "func": func,
+            "run_date": datetime.now(),
+            "args": (1,),
         },
-        "result": {
+        "result": {  # op_id is created in function call, so we must backpatch result
             "operations": {},
+            "result": 2,
         },
     }
     service = OperationsService()
-    op_id = service.execute_operation(lambda x: x+1)
-    assert ()
+    op_id = service.execute_operation(
+        func=test_table["input"]["func"],
+        run_date=test_table["input"]["run_date"],
+        args=test_table["input"]["args"],
+    )
+    test_table["result"]["operations"][op_id] = Operation(op_id, False, None)
+    assert service.operations == test_table["result"]["operations"]
