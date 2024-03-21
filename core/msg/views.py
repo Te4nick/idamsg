@@ -98,6 +98,13 @@ class MessageViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
+        queried = []
+        try:
+            for i in range(query_ser.offset, query_ser.offset + query_ser.limit):
+                queried.append(msgs[i])
+        except IndexError:
+            pass
+
         return Response(
             status=status.HTTP_200_OK,
             data=MessageSerializer(msgs, many=True).data,

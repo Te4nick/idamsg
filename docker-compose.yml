@@ -21,6 +21,8 @@ services:
     command:
       # poetry run python manage.py migrate &&
       poetry run python manage.py runserver 0.0.0.0:8000
+    networks:
+      - django_project
 
   db:
     image: postgres:latest
@@ -32,6 +34,12 @@ services:
       - "5445:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - django_project
 
 volumes:
   postgres_data:
+
+networks:
+  django_project:
+    name: django_project
