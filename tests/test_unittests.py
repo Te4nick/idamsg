@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.msg_service import MSGService
+from msg_service import MSGService
 
 
 def test_add_message():
@@ -68,8 +68,9 @@ def test_generate_most_common_words():
         for msg in test_table[channel]:
             ms.add_message(channel, *msg)
 
+    generated_path = ms.generate_most_common_words()
     image_path: str = f"./static/png/MostCommonWords_{datetime.today().strftime("%Y-%m-%d_%H-%M-%S")}.png"
-    assert ms.generate_most_common_words() == image_path
+    assert generated_path == image_path
 
 
 def test_uninitialized(capsys):
