@@ -100,7 +100,10 @@ class MessageViewSet(ViewSet):
 
         queried = []
         try:
-            for i in range(query_ser.offset, query_ser.offset + query_ser.limit):
+            for i in range(
+                query_ser.data.get("offset"),
+                query_ser.data.get("offset") + query_ser.data.get("limit"),
+            ):
                 queried.append(msgs[i])
         except IndexError:
             pass
